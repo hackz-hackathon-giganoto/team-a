@@ -1,0 +1,22 @@
+{
+  "name": "banana",
+  "version": "0.1.0",
+  "description": "これはばななです",
+  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hackz-hackathon-giganoto/team-a.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hackz-hackathon-giganoto/team-a/issues"
+  },
+  "homepage": "https://github.com/hackz-hackathon-giganoto/team-a#readme",
+  "devDependencies": {
+    "husky": "^7.0.0"
+  }
+}
