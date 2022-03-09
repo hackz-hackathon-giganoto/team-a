@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/hackz-hackathon-giganoto/team-a/issues"
   },
-  "homepage": "https://github.com/hackz-hackathon-giganoto/team-a#readme"
+  "homepage": "https://github.com/hackz-hackathon-giganoto/team-a#readme",
+  "devDependencies": {
+    "husky": "^7.0.0"
+  },
+  "scripts": {
+    "prepare": "husky install"
+  }
 }
