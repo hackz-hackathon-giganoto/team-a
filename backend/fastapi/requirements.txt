@@ -21,10 +21,11 @@ SoundFile
 SpeechRecognition
 starlette
 tomli
-tornado
 typing-extensions
 uvicorn
 Wave
 websockets
 aiofiles
 jinja2
+librosa
+PySoundFile
