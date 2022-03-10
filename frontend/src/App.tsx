@@ -1,24 +1,41 @@
-import React from "react";
-import logo from "./logo.svg";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
+// Custom components
+import NavBar from "./components/NavBar";
+import PublicHome from "./components/PublicHome";
+import PrivateHome from "./components/PrivateHome";
+
 function App() {
+  const [isAuthenticated, userHasAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  async function getUserInfo() {
+    try {
+      const response = await fetch("/.auth/me");
+      const payload = await response.json();
+      const { clientPrincipal } = payload;
+
+      if (clientPrincipal) {
+        setUser(clientPrincipal);
+        userHasAuthenticated(true);
+        console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
+      }
+    } catch (error: any) {
+      console.error("No profile could be found " + error?.message?.toString());
+    }
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <NavBar user={user} />
+      <main className="column">
+        {isAuthenticated ? <PrivateHome user={user} /> : <PublicHome />}
+      </main>
     </div>
   );
 }
