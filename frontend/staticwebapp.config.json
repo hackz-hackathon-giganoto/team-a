@@ -1,0 +1,26 @@
+{
+  "routes": [
+    {
+      "route": "/logout",
+      "redirect": "/.auth/logout"
+    },
+    {
+      "route": "/teapot",
+      "redirect": "https://www.google.com/teapot",
+      "statusCode": 301
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "index.html",
+    "exclude": []
+  },
+  "responseOverrides": {
+    "401": {
+      "redirect": "/login",
+      "statusCode": 302
+    }
+  },
+  "mimeTypes": {
+    ".json": "text/json"
+  }
+}
