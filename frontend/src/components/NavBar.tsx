@@ -3,7 +3,7 @@
 import React from "react";
 
 const NavBar = ({ user }: { user: any }) => {
-  const providers = ["twitter", "github", "aad"];
+  const providers = ["google", "twitter", "github", "aad"];
   const redirect = `/`;
 
   return (
