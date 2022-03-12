@@ -23,7 +23,6 @@ func New(dsn string) (*redis.Client, error) {
 	return client, nil
 }
 
-// 実装の参考のため保存
 func SetValue(savePath string, value string) error {
 	redisPath := os.Getenv("REDIS_HOST")
 	client, err := New(redisPath)

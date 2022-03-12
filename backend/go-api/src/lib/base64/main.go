@@ -52,12 +52,5 @@ func Decode(str string) image.Image {
 		return jpgI
 	}
 
-	// data, err := base64.StdEncoding.DecodeString(str) //[]byte
-	// return jpgI
-	// return data
-	// // file, _ := os.Create("encode_and_decord.jpg")
-	// defer file.Close()
-
-	// file.Write(data)
 	return nil
 }

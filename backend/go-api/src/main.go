@@ -99,16 +99,7 @@ func main() {
 	})
 
 	router.GET("/ws", func(c *gin.Context) {
-		// roomId := c.Param("roomId")
-		//roomdIdが存在しているかチェックする
-		// result, err := checkRoomId(roomId)
-		// if err != nil || !result {
-		// 	c.JSON(401, gin.H{
-		// 		"message": "Error!",
-		// 	})
-		// } else {
-		// serveWs(c.Writer, c.Request, "maid")
-		// }
+		// WebSocket is here...
 	})
 	router.Run(":8080")
 }
