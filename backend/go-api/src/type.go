@@ -1,9 +1,5 @@
 package main
 
-type GetScoreRequest struct {
-	UserId string `json:"user_id"`
-}
-
 type GetScoreResponse struct {
 	Cost      string `json:"cost"`
 	Score     int    `json:"score"`
