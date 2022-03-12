@@ -61,7 +61,7 @@ func main() {
 		}
 
 		// コストの取得（ここで計算処理を叩く感じかな）
-		const cost = "1000円"
+		const cost = "2490円"
 		// 文字列から数値へ
 		score, _ := strconv.Atoi(str_score)
 		// ユーザー数の取得（WebSocketでやるならこのAPIでは返さない気がする）
