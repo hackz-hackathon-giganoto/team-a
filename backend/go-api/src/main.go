@@ -101,5 +101,5 @@ func main() {
 	router.GET("/ws", func(c *gin.Context) {
 		// WebSocket is here...
 	})
-	router.Run(":8080")
+	router.Run(":80")
 }

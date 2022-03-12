@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: ./docker/app/Dockerfile
     ports:
-      - "8080:8080"
+      - "80:80"
     tty: true
     depends_on:
       - redis
