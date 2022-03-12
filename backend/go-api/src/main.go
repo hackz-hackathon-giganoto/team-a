@@ -42,7 +42,7 @@ func main() {
 	}))
 
 	router.GET("/score", func(c *gin.Context) {
-		user_id := c.Query("user_id") 
+		user_id := c.Query("user_id")
 
 		// スコアをRedisから取得
 		score, err := redis.GetValue(user_id)
