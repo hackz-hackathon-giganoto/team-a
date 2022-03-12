@@ -42,17 +42,10 @@ func main() {
 	}))
 
 	router.GET("/score", func(c *gin.Context) {
-		request := GetScoreRequest{}
-		err := c.BindJSON(&request)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": fmt.Sprintf("get form err: %s", err.Error()),
-			})
-			return
-		}
+		user_id := c.Query("user_id") 
 
-		// 保存パスをRedisから取得
-		str_score, err := redis.GetValue(request.UserId)
+		// スコアをRedisから取得
+		str_score, err := redis.GetValue(user_id)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{
 				"error": fmt.Sprintf("get redis err: %s", err.Error()),
