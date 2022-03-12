@@ -6,7 +6,8 @@ on:
       - main
       - feature/add-score-api
     paths:
-      - "backend/go-api/**"
+      - "backend/go-api/docker/**"
+      - "backend/go-api/src/**"
   workflow_dispatch:
 
 jobs:
