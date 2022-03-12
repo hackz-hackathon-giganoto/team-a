@@ -57,8 +57,8 @@ func main() {
 		const cost = "2490円"
 		// 文字列から数値へ
 		int_score, _ := strconv.Atoi(score)
-		// ユーザー数の取得（WebSocketでやるならこのAPIでは返さない気がする）
-		const user_count = 10
+		// 累計ユーザー数
+		user_count, _ := redis.DBSize()
 
 		c.JSON(http.StatusOK, GetScoreResponse{
 			Cost:      cost,

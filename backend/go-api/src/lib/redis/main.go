@@ -2,6 +2,7 @@ package redis
 
 import (
 	"log"
+	"math"
 	"os"
 	"time"
 
@@ -104,4 +105,25 @@ func DeclValue(target string) (int, error) {
 		return 0, errors.Wrap(err, "Failed to decr value")
 	}
 	return int(currentNum), nil
+}
+
+func DBSize() (int, error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return -1, errors.Wrap(err, "Failed to get redis client")
+	}
+	defer client.Close()
+	dbsize := client.DBSize().Val()
+	log.Println(dbsize)
+	log.Println("aaa")
+	return Int64ToInt(dbsize), nil
+}
+
+func Int64ToInt(i int64) int {
+    if i < math.MinInt32 || i > math.MaxInt32 {
+        return 0
+    } else {
+        return int(i)
+    }
 }
