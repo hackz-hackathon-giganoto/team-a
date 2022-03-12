@@ -1,7 +1,7 @@
 package main
 
 type PostScoreRequest struct {
-	Score string `json:"score"`
+	Score  int    `json:"score"`
 	UserId string `json:"user_id"`
 }
 
@@ -14,7 +14,7 @@ type GetScoreRequest struct {
 }
 
 type GetScoreResponse struct {
-	Cost string `json:"cost"`
-	Score string `json:"score"`
-	UserCount string `json:"user_count"`
+	Cost      string `json:"cost"`
+	Score     int    `json:"score"`
+	UserCount int    `json:"user_count"`
 }

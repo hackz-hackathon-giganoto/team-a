@@ -52,7 +52,7 @@ func main() {
 		}
 
 		// 保存パスをRedisから取得
-		score, err := redis.GetValue(request.UserId)
+		str_score, err := redis.GetValue(request.UserId)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{
 				"error": fmt.Sprintf("get redis err: %s", err.Error()),
@@ -62,13 +62,15 @@ func main() {
 
 		// コストの取得（ここで計算処理を叩く感じかな）
 		const cost = "1000円"
+		// 文字列から数値へ
+		score, _ := strconv.Atoi(str_score)
 		// ユーザー数の取得（WebSocketでやるならこのAPIでは返さない気がする）
 		const user_count = 10
 
-		c.JSON(http.StatusOK, gin.H{
-			"cost": cost,
-			"score": score,
-			"user_count": strconv.Itoa(user_count),
+		c.JSON(http.StatusOK, GetScoreResponse{
+			Cost:      cost,
+			Score:     score,
+			UserCount: user_count,
 		})
 	})
 
@@ -83,7 +85,7 @@ func main() {
 		}
 
 		// スコアをRedisに保存
-		err = redis.SetValue(request.UserId, request.Score)
+		err = redis.SetValue(request.UserId, strconv.Itoa(request.Score))
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{
 				"error": fmt.Sprintf("get redis err: %s", err.Error()),
@@ -91,8 +93,8 @@ func main() {
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok",
+		c.JSON(http.StatusOK, PostScoreResponse{
+			Message: "ok",
 		})
 	})
 
