@@ -1,7 +1,9 @@
 version: "3.9"
 services:
   voice-api: 
-    build: ./fastapi
+    build: 
+      context: ./fastapi
+      dockerfile: Dockerfile.m1
     ports: 
       - "9000:9000"
       - "8000:8000"
