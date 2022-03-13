@@ -9,7 +9,7 @@ ENV GOARCH=amd64
 # Build
 RUN go build -o app
 
-FROM golang:bullseye
+FROM gcr.io/distroless/base
 WORKDIR /
 COPY --from=builder /workdir/app /app
 
