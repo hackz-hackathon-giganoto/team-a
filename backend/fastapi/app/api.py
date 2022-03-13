@@ -39,7 +39,6 @@ def convertM4aToWav():
 
 @app.post("/convert/wav")
 async def create_upload_file(file: UploadFile = File(...)):
-
     wavdata = file.file
     r = sr.Recognizer()
     audio_data, samplerate = sf.read(BytesIO(wavdata.read()))
