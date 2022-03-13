@@ -1,9 +1,9 @@
 package main
 
 type GetScoreResponse struct {
-	Cost      string `json:"cost"`
-	Score     int    `json:"score"`
-	UserCount int    `json:"user_count"`
+	Cost      int `json:"cost"`
+	Score     int `json:"score"`
+	UserCount int `json:"user_count"`
 }
 
 type PostScoreRequest struct {

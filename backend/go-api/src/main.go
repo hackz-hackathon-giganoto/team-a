@@ -54,7 +54,7 @@ func main() {
 		}
 
 		// コストの取得（ここで計算処理を叩く感じかな）
-		cost := "2490円"
+		cost := 2490
 		// 文字列から数値へ
 		int_score, _ := strconv.Atoi(score)
 		// 累計ユーザー数
