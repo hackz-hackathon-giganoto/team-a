@@ -2,7 +2,9 @@
 import logging
 import multiprocessing
 import os
+import librosa
 import time
+import soundfile as sf
 import wave
 from multiprocessing import set_start_method
 from multiprocessing.queues import Queue
@@ -47,6 +49,9 @@ async def get_cookie_or_token(
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
     return session or token
 
+def wav_read(path):
+    wave, fs = sf.read(path) #音データと周波数を読み込む
+    return wave, fs
 
 def voice_recognition(filename):
     r = sr.Recognizer()
@@ -56,6 +61,10 @@ def voice_recognition(filename):
     print("Text:", text)
     return text
 
+def calc_rms(filename):
+    wave, fs = wav_read(filename)
+    # db: 20 * log_10(volume)
+    rms = librosa.feature.rms(y=wave) #音量の計算
 
 def wav_worker(
     q: Queue,
