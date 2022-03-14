@@ -52,3 +52,30 @@ func GetPodsCount(config *rest.Config, namespace string, pod string) (int, error
 	}
 	return len(frontPods.Items), nil
 }
+
+func UpdatePodCount(config *rest.Config, namespace string, pod string, count int) (int, error) {
+	client, err := kubernetes.NewForConfig(config)
+    if err != nil {
+        return -1, err
+    }
+
+    s, err := client.AppsV1().
+        Deployments(namespace).
+        GetScale(context.TODO(), "giganoto-nginx", metav1.GetOptions{})
+    if err != nil {
+        return -1, err
+    }
+
+    sc := *s
+    sc.Spec.Replicas = int32(count)
+
+    us, err := client.AppsV1().
+        Deployments(namespace).
+        UpdateScale(context.TODO(), "giganoto-nginx", &sc, metav1.UpdateOptions{})
+    if err != nil {
+        return -1, err
+    }
+	log.Println(*us)
+
+    return 0, nil
+}
