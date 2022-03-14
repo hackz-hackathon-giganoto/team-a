@@ -25,6 +25,6 @@ jobs:
 
       - uses: azure/webapps-deploy@v2
         with:
-          app-name: "giganoto-goapi"
+          app-name: "giganoto-fastapi"
           publish-profile: ${{ secrets.FAST_API_AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: "${{ secrets.FAST_API_REGISTRY_HOST }}/goapi:${{ github.sha }}"
+          images: "${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }}"
