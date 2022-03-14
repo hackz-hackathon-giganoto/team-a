@@ -99,7 +99,7 @@ const App = () => {
             Object.keys(data).forEach(function (key) {
                 params.append(key, this[key]);
             }, data);
-            const res = await axios.post("http://localhost:8000/convert/wav", params, {
+            const res = await axios.post(`${process.env.FAST_API_HOST || "http://localhost:8000"}/convert/wav`, params, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -199,7 +199,25 @@ const App = () => {
             if (clientPrincipal) {
                 setUser(clientPrincipal);
                 userHasAuthenticated(true);
-                console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal.user)}`);
+                console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
+
+                // WebSocket
+                console.log("websocket init")
+                webSocket = new WebSocket(
+                    `ws://localhost/ws/${clientPrincipal.userId}`
+                )
+                webSocket.onmessage = function (event) {
+                    const json = JSON.parse(event.data);
+                    console.log(`[message] Data received from server: ${json}`);
+                    try {
+                        if ((json.event = "data")) {
+                            console.log(json.data);
+                        }
+                    } catch (err) {
+                        console.log(err)
+                        // whatever you wish to do with the err
+                    }
+                };
             }
         } catch (error) {
             console.error("No profile could be found " + error?.message?.toString());
