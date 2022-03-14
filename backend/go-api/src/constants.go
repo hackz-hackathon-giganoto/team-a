@@ -1,0 +1,3 @@
+package main
+
+// constant value is here...
