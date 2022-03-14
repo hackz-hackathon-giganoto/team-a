@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"strconv"
 
 	"main/lib/k8s"
@@ -11,9 +13,22 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/util/homedir"
 )
 
 func main() {
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	// use the current context in kubeconfig
+	config, _ := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+
 	router := gin.Default()
 	// Set a lower memory limit for multipart forms (default is 32 MiB)
 	router.MaxMultipartMemory = 8 << 20 // 8 MiB
@@ -99,7 +114,7 @@ func main() {
 	router.GET("/pod", func(c *gin.Context) {
 		namespace := c.Query("namespace")
 		pod := c.Query("pod_name")
-		podsCount, err := k8s.GetPodsCount(namespace, pod)
+		podsCount, err := k8s.GetPodsCount(config, namespace, pod)
 		if err != nil || podsCount == -1 {
 			c.JSON(http.StatusBadGateway, gin.H{
 				"error": fmt.Sprintf("get k8s err: %s", err.Error()),
