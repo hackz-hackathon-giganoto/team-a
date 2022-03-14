@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.FAST_API_REGISTRY_USERNAME }}
           password: ${{ secrets.FAST_API_REGISTRY_PASSWORD }}
       - run: |
-          docker build ./backend/fastapi/ -t ${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }} -f "backend/fastapi/Dockerfile"
+          docker build ./backend/fastapi/ -t ${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }} -f "backend/fastapi/Dockerfile.debian"
           docker push ${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }}
 
       - uses: azure/webapps-deploy@v2
