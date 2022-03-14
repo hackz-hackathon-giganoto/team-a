@@ -126,5 +126,19 @@ func main() {
 			Count: podsCount,
 		})
 	})
+
+	router.POST("/pod", func(c *gin.Context) {
+		namespace := c.Query("namespace")
+		pod := c.Query("pod_name")
+		pod_count, _ := strconv.Atoi(c.Query("pod_count"))
+		status, err := k8s.UpdatePodCount(config, namespace, pod, pod_count)
+		if err != nil || status == -1 {
+			c.JSON(http.StatusBadGateway, gin.H{
+				"error": fmt.Sprintf("get k8s err: %s", err.Error()),
+			})
+			return
+		}
+	})
+
 	router.Run(":80")
 }
