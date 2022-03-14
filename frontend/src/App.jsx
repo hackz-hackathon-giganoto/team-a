@@ -3,9 +3,14 @@ import "./App.css";
 import ReactAudioPlayer from "react-audio-player";
 import axios from "axios";
 import AudioRecorder from "audio-recorder-polyfill";
+import NavBar from "./components/NavBar";
+
 window.MediaRecorder = AudioRecorder;
 
 const App = () => {
+  // Auth
+  const [isAuthenticated, userHasAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [file, setFile] = useState([]);
   const [audioState, setAudioState] = useState(true);
   const audioRef = useRef();
@@ -31,6 +36,8 @@ const App = () => {
       handleSuccess,
       hancleError
     );
+    // Auth
+    getUserInfo();
   }, []);
   // export WAV from audio float data
   const exportWAV = function (audioData) {
@@ -168,7 +175,6 @@ const App = () => {
     onPostForm({
       file: new File([new Blob(file)], "test.wav", metadata),
     });
-
   };
   const handleRemove = () => {
     setAudioState(true);
@@ -188,8 +194,27 @@ const App = () => {
 
     audioData.push(bufferData);
   };
+
+  // auth
+  async function getUserInfo() {
+    try {
+      const response = await fetch("/.auth/me");
+      const payload = await response.json();
+      const { clientPrincipal } = payload;
+
+      if (clientPrincipal) {
+        setUser(clientPrincipal);
+        userHasAuthenticated(true);
+        console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
+      }
+    } catch (error) {
+      console.error("No profile could be found " + error?.message?.toString());
+    }
+  }
+
   return (
     <div>
+      <NavBar user={user} />
       <button onClick={handleStart}>録音</button>
       <button onClick={handleStop} disabled={audioState}>
         ストップ
@@ -199,6 +224,7 @@ const App = () => {
       </button>
       <button onClick={handleRemove}>削除</button>
       <ReactAudioPlayer src={URL.createObjectURL(new Blob(file))} controls />
+      {isAuthenticated ? <p>ログイン済み</p> : <p>未ログイン</p>}
     </div>
   );
 };
