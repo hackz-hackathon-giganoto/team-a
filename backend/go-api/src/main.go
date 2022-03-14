@@ -24,7 +24,7 @@ func startJob(config *rest.Config) {
 	go func() {
 
 		for range time.Tick(30 * time.Second) {
-
+			fmt.Println("Job is called")
 			// 全スコアデータの取得
 			allScores, err := redis.HVals(STORE_USER_SCORE)
 
@@ -46,6 +46,7 @@ func startJob(config *rest.Config) {
 				log.Println(err)
 				continue
 			}
+			fmt.Println("Current target num:", len(userList))
 
 			podNum, _ := k8s.GetPodsCount(config, "default", POD_NAME)
 			cost := K8S_COST * podNum
@@ -155,7 +156,7 @@ func main() {
 		}
 
 		// スコアをRedisに保存
-		err = redis.HINCRBY(STORE_USER_SCORE, request.UserId, int64(request.Score))
+		err = redis.HINCRBY(STORE_USER_SCORE, request.UserId, request.Score)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": fmt.Sprintf("LOG: %s", err.Error()),
@@ -176,8 +177,9 @@ func main() {
 		})
 	})
 
-	router.GET("/ws", func(c *gin.Context) {
-		// WebSocket is here...
+	router.GET("/ws/:userId", func(c *gin.Context) {
+		userId := c.Param("userId")
+		serveWs(c.Writer, c.Request, userId)
 	})
 
 	router.GET("/pod", func(c *gin.Context) {

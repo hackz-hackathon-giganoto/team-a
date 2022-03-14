@@ -9,7 +9,7 @@ type GetScoreResponse struct {
 }
 
 type PostScoreRequest struct {
-	Score  int    `json:"score"`
+	Score  float64    `json:"score"`
 	UserId string `json:"user_id"`
 }
 
@@ -79,7 +79,7 @@ type InitObject struct {
 
 type SocketResponse struct {
 	Action string `json:"action"`
-	Score  int64  `json:"score"`
+	Score  float64 `json:"score"`
 	Cost   int64  `json:"cost"`
 	Count  int    `json:"count"`
 }

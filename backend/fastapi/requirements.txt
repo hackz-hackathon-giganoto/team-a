@@ -15,3 +15,5 @@ aiofiles
 librosa
 PySoundFile
 pydub
+requests
+urllib3

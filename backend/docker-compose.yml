@@ -7,6 +7,8 @@ services:
     ports: 
       - "9000:9000"
       - "8000:8000"
+    environment:
+      - GO_API_URL=http://api:80/score
 
   api:
     build:

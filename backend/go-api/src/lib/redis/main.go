@@ -24,7 +24,7 @@ func New(dsn string) (*redis.Client, error) {
 	return client, nil
 }
 
-func HINCRBY(key string, field string, value int64) (err error) {
+func HINCRBY(key string, field string, value float64) (err error) {
 	redisPath := os.Getenv("REDIS_HOST")
 	client, err := New(redisPath)
 	if err != nil {
@@ -32,21 +32,21 @@ func HINCRBY(key string, field string, value int64) (err error) {
 	}
 	defer client.Close()
 
-	err = client.HIncrBy(key, field, value).Err()
+	err = client.HIncrByFloat(key, field, value).Err()
 	if err != nil {
 		return errors.Wrap(err, "Failed to save item")
 	}
 	return nil
 }
 
-func HGetInt(key string, field string) (value int64, err error) {
+func HGetInt(key string, field string) (value float64, err error) {
 	redisPath := os.Getenv("REDIS_HOST")
 	client, err := New(redisPath)
 	if err != nil {
 		return -1, err
 	}
 	defer client.Close()
-	value, err = client.HGet(key, field).Int64()
+	value, err = client.HGet(key, field).Float64()
 	if err != nil {
 		return -1, err
 	}
