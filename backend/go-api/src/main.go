@@ -20,25 +20,30 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
+func calcAllScore() int64 {
+	allScores, err := redis.HVals(STORE_USER_SCORE)
+
+	if err != nil {
+		log.Println(err)
+		return -1
+	}
+	//母数の計算
+	var score int64
+	for _, val := range allScores {
+		convertVal, _ := strconv.ParseInt(val, 10, 64)
+		score = score + convertVal
+	}
+	return score
+}
 func startJob(config *rest.Config) {
+
+	// WebSocketに良い感じに流すジョブ
 	go func() {
-
 		for range time.Tick(30 * time.Second) {
-			fmt.Println("Job is called")
-			// 全スコアデータの取得
-			allScores, err := redis.HVals(STORE_USER_SCORE)
-
-			if err != nil {
-				log.Println(err)
-				continue
-			}
+			fmt.Println("Socket Job is called")
 
 			//母数の計算
-			var score int64
-			for _, val := range allScores {
-				convertVal, _ := strconv.ParseInt(val, 10, 64)
-				score = score + convertVal
-			}
+			score := calcAllScore()
 
 			//ユーザーリストの取得
 			userList, err := redis.SMEMBERS(CONNECTION_PATH)
@@ -66,6 +71,7 @@ func startJob(config *rest.Config) {
 					Action: "SCORE_DATA",
 					Count:  connections,
 					Score:  userScore,
+					Pods:   podNum,
 				}
 				response, err := json.Marshal(callback)
 				if err != nil {
@@ -75,6 +81,27 @@ func startJob(config *rest.Config) {
 				m := message{response, userId}
 				h.broadcast <- m
 			}
+		}
+	}()
+	//全ユーザーのスコアが1000nに達したらpodを増やす
+	const threshold = 1000
+	const minNum = 3
+	// Podの監視ジョブ
+	go func() {
+		for range time.Tick(6 * time.Second) {
+			fmt.Println("Pod Job is called")
+			score := calcAllScore()
+			podNum, _ := k8s.GetPodsCount(config, "default", POD_NAME)
+			log.Println("Score is", score)
+			newNum := (score / threshold) + minNum
+			log.Println("Pod num is ", newNum)
+			if newNum < int64(podNum) {
+				continue
+			}
+			// _, err := k8s.UpdatePodCount(config, "default", POD_NAME, int(newNum))
+			// if err != nil {
+			// 	log.Println(err)
+			// }
 		}
 	}()
 }
