@@ -2,7 +2,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 const NavBar = ({ user }) => {
   const providers = ["google", "twitter", "github", "aad"];
