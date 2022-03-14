@@ -4,7 +4,7 @@ import ReactAudioPlayer from "react-audio-player";
 import axios from "axios";
 import AudioRecorder from "audio-recorder-polyfill";
 import NavBar from "./components/NavBar";
-
+import { v4 as uuidv4 } from 'uuid';
 window.MediaRecorder = AudioRecorder;
 
 const App = () => {
@@ -173,7 +173,7 @@ const App = () => {
       contentType: "audio/wav",
     };
     onPostForm({
-      file: new File([new Blob(file)], "test.wav", metadata),
+      file: new File([new Blob(file)], uuidv4()+".wav", metadata),
     });
   };
   const handleRemove = () => {
