@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/add-score-api
     paths:
       - "backend/go-api/docker/**"
       - "backend/go-api/src/**"
