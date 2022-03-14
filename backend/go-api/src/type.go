@@ -82,5 +82,5 @@ type SocketResponse struct {
 	Score  float64 `json:"score"`
 	Cost   int64   `json:"cost"`
 	Count  int     `json:"count"`
-	Pods   int     `json:"pods_num"`
+	Pods   int     `json:"pod_num"`
 }
