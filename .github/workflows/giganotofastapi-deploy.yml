@@ -1,0 +1,30 @@
+name: Azure App Service CI/CD for FastAPI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/fastapi/**"
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.FAST_API_REGISTRY_HOST }}
+          username: ${{ secrets.FAST_API_REGISTRY_USERNAME }}
+          password: ${{ secrets.FAST_API_REGISTRY_PASSWORD }}
+      - run: |
+          docker build ./backend/fastapi/ -t ${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }} -f "backend/fastapi/Dockerfile"
+          docker push ${{ secrets.FAST_API_REGISTRY_HOST }}/fastapi:${{ github.sha }}
+
+      - uses: azure/webapps-deploy@v2
+        with:
+          app-name: "giganoto-goapi"
+          publish-profile: ${{ secrets.FAST_API_AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: "${{ secrets.FAST_API_REGISTRY_HOST }}/goapi:${{ github.sha }}"

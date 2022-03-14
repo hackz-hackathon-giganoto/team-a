@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "backend/**"
+      - "backend/go-api/**"
   workflow_dispatch:
 
 jobs:
