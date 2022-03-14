@@ -67,7 +67,6 @@ const App = () => {
             writeString(view, 36, "data"); // dataチャンク
             view.setUint32(40, samples.length * 2, true); // 波形データのバイト数
             floatTo16BitPCM(view, 44, samples); // 波形データ
-
             return view;
         };
 
