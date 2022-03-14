@@ -1,21 +1,22 @@
 # coding: utf-8
-import os
+from os import getenv
 import speech_recognition as sr
-
 import math
 import soundfile as sf
 from io import BytesIO
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 import librosa
 import random
 import shutil
+import json
 import string
 import pydub
 from pydub import AudioSegment
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 import wave
+import requests
 
 SAMPLE_SIZE = 1
 SAMPLE_RATE = 44100
@@ -103,25 +104,32 @@ def calc_score(filename):
     parcent = len(text) / str_len
     score_text = 100 - (100 * parcent)
 
-    data['rms'] = rms
-    data['text'] = text
+    data['duration'] = duration
+    data['score'] = score_text
     print(rms)
     # data['db'] = 20 * math.log10(rms)
     return data
 
 
 @app.post("/convert/wav")
-async def create_upload_file(file: UploadFile = File(...)):
+async def create_upload_file(file: UploadFile = File(...), user_id: str = Form(...)):
+    # 前処理
+    print(user_id)
     wavdata = file.file
-    print(file.filename)
     audio_data, samplerate = sf.read(BytesIO(wavdata.read()))
-    filename = randomname(16) + ".wav"
+    filename = randomname(32) + ".wav"
     sf.write(filename, audio_data, samplerate)
-    # with sr.AudioFile(filename) as source:
-    #     audio = r.record(source)
+
+    # スコアデータの計算
     score = calc_score(filename)
-    # text = r.recognize_google(audio, language="ja-JP")
-    return {"text": score['text']}
+    # Goサーバーに送信
+    request_data = {"score": score["score"], "user_id": user_id}
+    # リクエストを作成
+    print(json.dumps(request_data))
+    response = requests.post(
+        getenv("GO_API_URL"),
+        data=json.dumps(request_data))
+    return json.loads(response.text)
 
 
 def save_upload_file_tmp(upload_file: UploadFile) -> Path:

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -13,9 +15,69 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
+
+func startJob(config *rest.Config) {
+	go func() {
+
+		for range time.Tick(30 * time.Second) {
+			fmt.Println("Job is called")
+			// 全スコアデータの取得
+			allScores, err := redis.HVals(STORE_USER_SCORE)
+
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+
+			//母数の計算
+			var score int64
+			for _, val := range allScores {
+				convertVal, _ := strconv.ParseInt(val, 10, 64)
+				score = score + convertVal
+			}
+
+			//ユーザーリストの取得
+			userList, err := redis.SMEMBERS(CONNECTION_PATH)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fmt.Println("Current target num:", len(userList))
+
+			podNum, _ := k8s.GetPodsCount(config, "default", POD_NAME)
+			cost := K8S_COST * podNum
+
+			for _, userId := range userList {
+				// 各ユーザーのスコアを取得
+				userScore, err := redis.HGetInt(STORE_USER_SCORE, userId)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				//ユーザー負担額の計算
+				userCost := cost * (int(userScore) / (int(score) * 1.0))
+				connections, _ := redis.DBSize()
+				callback := SocketResponse{
+					Cost:   int64(userCost),
+					Action: "SCORE_DATA",
+					Count:  connections,
+					Score:  userScore,
+				}
+				response, err := json.Marshal(callback)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				m := message{response, userId}
+				h.broadcast <- m
+			}
+		}
+	}()
+}
 
 func main() {
 	var kubeconfig *string
@@ -94,51 +156,61 @@ func main() {
 		}
 
 		// スコアをRedisに保存
-		err = redis.SetValue(request.UserId, strconv.Itoa(request.Score))
+		err = redis.HINCRBY(STORE_USER_SCORE, request.UserId, request.Score)
 		if err != nil {
-			c.JSON(http.StatusBadGateway, gin.H{
-				"error": fmt.Sprintf("get redis err: %s", err.Error()),
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": fmt.Sprintf("LOG: %s", err.Error()),
 			})
 			return
 		}
+
+		// err = redis.SetValue(request.UserId, strconv.Itoa(request.Score))
+		// if err != nil {
+		// 	c.JSON(http.StatusBadGateway, gin.H{
+		// 		"error": fmt.Sprintf("get redis err: %s", err.Error()),
+		// 	})
+		// 	return
+		// }
 
 		c.JSON(http.StatusOK, PostScoreResponse{
 			Message: "ok",
 		})
 	})
+	// router.POST("/pod", func(c *gin.Context) {
+	// 	namespace := c.Query("namespace")
+	// 	pod := c.Query("pod_name")
+	// 	pod_count, _ := strconv.Atoi(c.Query("pod_count"))
+	// 	status, err := k8s.UpdatePodCount(config, namespace, pod, pod_count)
+	// 	if err != nil || status == -1 {
+	// 		c.JSON(http.StatusBadGateway, gin.H{
+	// 			"error": fmt.Sprintf("get k8s err: %s", err.Error()),
+	// 		})
+	// 		return
+	// 	}
+	// })
+	// router.GET("/pod", func(c *gin.Context) {
+	// 	namespace := c.Query("namespace")
+	// 	pod := c.Query("pod_name")
+	// 	podsCount, err := k8s.GetPodsCount(config, namespace, pod)
+	// 	if err != nil || podsCount == -1 {
+	// 		c.JSON(http.StatusBadGateway, gin.H{
+	// 			"error": fmt.Sprintf("get k8s err: %s", err.Error()),
+	// 		})
+	// 		return
+	// 	}
 
-	router.GET("/ws", func(c *gin.Context) {
-		// WebSocket is here...
+	// 	c.JSON(http.StatusOK, GetPodsCountResponse{
+	// 		Count: podsCount,
+	// 	})
+
+	// })
+	router.GET("/ws/:userId", func(c *gin.Context) {
+		userId := c.Param("userId")
+		serveWs(c.Writer, c.Request, userId)
 	})
 
-	router.GET("/pod", func(c *gin.Context) {
-		namespace := c.Query("namespace")
-		pod := c.Query("pod_name")
-		podsCount, err := k8s.GetPodsCount(config, namespace, pod)
-		if err != nil || podsCount == -1 {
-			c.JSON(http.StatusBadGateway, gin.H{
-				"error": fmt.Sprintf("get k8s err: %s", err.Error()),
-			})
-			return
-		}
-
-		c.JSON(http.StatusOK, GetPodsCountResponse{
-			Count: podsCount,
-		})
-	})
-
-	router.POST("/pod", func(c *gin.Context) {
-		namespace := c.Query("namespace")
-		pod := c.Query("pod_name")
-		pod_count, _ := strconv.Atoi(c.Query("pod_count"))
-		status, err := k8s.UpdatePodCount(config, namespace, pod, pod_count)
-		if err != nil || status == -1 {
-			c.JSON(http.StatusBadGateway, gin.H{
-				"error": fmt.Sprintf("get k8s err: %s", err.Error()),
-			})
-			return
-		}
-	})
+	go h.run()
+	startJob(config)
 
 	router.Run(":80")
 }

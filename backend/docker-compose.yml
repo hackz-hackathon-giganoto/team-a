@@ -1,10 +1,29 @@
 version: "3.9"
 services:
   voice-api: 
-    build: ./fastapi
+    build: 
+      context: ./fastapi
+      dockerfile: Dockerfile.debian
     ports: 
       - "9000:9000"
       - "8000:8000"
+    environment:
+      - GO_API_URL=http://api:80/score
+
+  api:
+    build:
+      context: ./go-api
+      dockerfile: ./docker/app/Dockerfile
+    ports:
       - "80:80"
-      - "443:443"
-    platform: linux/x86_64
+    tty: true
+    depends_on:
+      - redis
+    environment:
+      - "REDIS_HOST=redis:6379"
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    command: redis-server
