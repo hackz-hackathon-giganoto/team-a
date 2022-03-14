@@ -21,8 +21,9 @@ import (
 )
 
 func startJob(config *rest.Config) {
-	go func() {
 
+	// WebSocketに良い感じに流すジョブ
+	go func() {
 		for range time.Tick(30 * time.Second) {
 			fmt.Println("Job is called")
 			// 全スコアデータの取得
@@ -66,6 +67,7 @@ func startJob(config *rest.Config) {
 					Action: "SCORE_DATA",
 					Count:  connections,
 					Score:  userScore,
+					Pods:   podNum,
 				}
 				response, err := json.Marshal(callback)
 				if err != nil {
