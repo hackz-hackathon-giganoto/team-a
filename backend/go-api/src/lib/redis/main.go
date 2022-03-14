@@ -24,6 +24,50 @@ func New(dsn string) (*redis.Client, error) {
 	return client, nil
 }
 
+func HINCRBY(key string, field string, value int64) (err error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	err = client.HIncrBy(key, field, value).Err()
+	if err != nil {
+		return errors.Wrap(err, "Failed to save item")
+	}
+	return nil
+}
+
+func HGetInt(key string, field string) (value int64, err error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return -1, err
+	}
+	defer client.Close()
+	value, err = client.HGet(key, field).Int64()
+	if err != nil {
+		return -1, err
+	}
+	return
+}
+
+func HVals(key string) (values []string, err error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return nil, err
+	}
+	defer client.Close()
+	values, err = client.HVals(key).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
 func SetValue(savePath string, value string) error {
 	redisPath := os.Getenv("REDIS_HOST")
 	client, err := New(redisPath)
@@ -121,9 +165,54 @@ func DBSize() (int, error) {
 }
 
 func Int64ToInt(i int64) int {
-    if i < math.MinInt32 || i > math.MaxInt32 {
-        return 0
-    } else {
-        return int(i)
-    }
+	if i < math.MinInt32 || i > math.MaxInt32 {
+		return 0
+	} else {
+		return int(i)
+	}
+}
+
+func SADD(key string, value string) (flag int64, err error) {
+
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return -1, errors.Wrap(err, "Failed to get redis client")
+	}
+	defer client.Close()
+	flag, err = client.SAdd(key, value).Result()
+
+	if flag == 0 {
+		log.Println(value + " was already a member of the set!")
+	}
+	return
+}
+
+func SREM(key string, value string) (err error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return errors.Wrap(err, "Failed to get redis client")
+	}
+	defer client.Close()
+	err = client.SRem(key, value).Err()
+	if err != nil {
+		log.Println(err)
+	}
+	return nil
+}
+
+func SMEMBERS(key string) (lists []string, err error) {
+	redisPath := os.Getenv("REDIS_HOST")
+	client, err := New(redisPath)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to get redis client")
+	}
+	defer client.Close()
+	lists, err = client.SMembers(key).Result()
+
+	if err != nil {
+		log.Println(err)
+	}
+	return
 }

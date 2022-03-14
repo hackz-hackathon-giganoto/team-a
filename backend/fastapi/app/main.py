@@ -1,7 +1,6 @@
 # coding: utf-8
 import os
 import speech_recognition as sr
-
 import math
 import soundfile as sf
 from io import BytesIO
@@ -104,7 +103,7 @@ def calc_score(filename):
     score_text = 100 - (100 * parcent)
 
     data['rms'] = rms
-    data['text'] = text
+    data['text'] = score_text
     print(rms)
     # data['db'] = 20 * math.log10(rms)
     return data
