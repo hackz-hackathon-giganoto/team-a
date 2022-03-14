@@ -15,6 +15,7 @@ import pydub
 from pydub import AudioSegment
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+import wave
 
 SAMPLE_SIZE = 1
 SAMPLE_RATE = 44100
@@ -40,29 +41,68 @@ def randomname(n):
 
 
 def wav_read(path):
-    wave, fs = sf.read(path)  # 音データと周波数を読み込む
-    return wave, fs
+    wave_data, fs = sf.read(path)  # 音データと周波数を読み込む
+    return wave_data, fs
 
 
 def calc_rms(filename):
-    wave, fs = wav_read(filename)
+    # 情報取得
+    # 読み込みモードでWAVファイルを開く
+    with wave.open(filename, 'rb') as wr:
+        # 情報取得
+        # ch = wr.getnchannels()
+        # width = wr.getsampwidth()
+        fr = wr.getframerate()
+        fn = wr.getnframes()
+        # 表示
+        # print("チャンネル: ", ch)
+        # print("サンプルサイズ: ", width)
+        # print("サンプリングレート: ", fr)
+        # print("フレームレート: ", fn)
+        print("再生時間: ", 1.0 * fn / fr)
+    wave_data, fs = wav_read(filename)
+
     # db: 20 * log_10(volume)
-    rms = librosa.feature.rms(y=wave)  # 音量の計算
-    return rms
+    rms = librosa.feature.rms(y=wave_data)  # 音量の計算
+    return {"rms": rms, "duration": 1.0 * fn / fr}
+
 
 def voice_recognition(filename):
     r = sr.Recognizer()
     with sr.AudioFile(filename) as source:
         audio = r.record(source)
-    text = r.recognize_google(audio, language="ja-JP")
+    try:
+        text = r.recognize_google(audio, language="ja-JP")
+    except BaseException:
+        text = ""
+        pass
     print("Text:", text)
     return text
 
 
+"""
+採点基準:
+1. 言語化出来なかったら => 10
+2. 言語化出来た場合 => 音声の長さに対する割合が低いほど良い => ポイントに応じる
+    - 1秒6文字
+
+"""
+
+
 def calc_score(filename):
+    # 1秒の文字数
+    second_str = 6
     data = {}
     rms = calc_rms(filename)
     text = voice_recognition(filename)
+    duration = rms["duration"]
+
+    # 総文字数を計算
+    str_len = second_str * duration
+    # 割合を計算
+    parcent = len(text) / str_len
+    score_text = 100 - (100 * parcent)
+
     data['rms'] = rms
     data['text'] = text
     print(rms)
@@ -81,7 +121,7 @@ async def create_upload_file(file: UploadFile = File(...)):
     #     audio = r.record(source)
     score = calc_score(filename)
     # text = r.recognize_google(audio, language="ja-JP")
-    return score
+    return {"text": score['text']}
 
 
 def save_upload_file_tmp(upload_file: UploadFile) -> Path:
