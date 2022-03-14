@@ -1,0 +1,22 @@
+# build
+FROM python:3.10-slim-buster as build-stage
+COPY requirements.txt /root/
+# RUN apt update -y && apt install build-essential libopenblas-dev ffmpeg sox libffi-dev libsndfile-dev -y
+RUN pip install -r /root/requirements.txt
+
+
+FROM python:3.10-slim-buster
+WORKDIR /api
+
+ENV LANG ja_JP.UTF-8
+ENV LANGUAGE ja_JP:ja
+ENV LC_ALL ja_JP.UTF-8
+ENV TZ JST-9
+RUN apt update -y && apt install libopenblas-dev ffmpeg libffi-dev libsndfile-dev llvm-dev -y && apt autoremove && apt clean && rm -rf /var/lib/apt/lists/*
+COPY --from=build-stage /usr/local/lib/python3.10/site-packages /usr/local/lib/python3.10/site-packages
+COPY --from=build-stage /usr/local/bin/uvicorn /usr/local/bin/uvicorn
+COPY *.pem .
+COPY ./app/main.py /api/app/
+
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000","--ssl-keyfile=./key.pem" ,"--ssl-certfile=./cert.pem"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

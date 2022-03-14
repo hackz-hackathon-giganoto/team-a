@@ -1,0 +1,17 @@
+cffi
+fastapi
+h11
+numpy
+platformdirs
+python-multipart
+regex
+six
+SoundFile
+SpeechRecognition
+starlette
+uvicorn
+Wave
+aiofiles
+librosa
+PySoundFile
+pydub

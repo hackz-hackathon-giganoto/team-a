@@ -10,10 +10,15 @@
     "@types/node": "^16.7.13",
     "@types/react": "^17.0.20",
     "@types/react-dom": "^17.0.9",
+    "audio-recorder-polyfill": "^0.4.1",
+    "axios": "^0.26.1",
+    "next": "^12.1.0",
     "react": "^17.0.2",
+    "react-audio-player": "^0.17.0",
     "react-dom": "^17.0.2",
-    "react-scripts": "5.0.0",
-    "typescript": "^4.4.2",
+    "react-media-recorder": "^1.6.3",
+    "react-scripts": "^5.0.0",
+    "typescript": "4.6.2",
     "web-vitals": "^2.1.0"
   },
   "scripts": {
@@ -35,7 +40,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
-    "eslint": "^8.10.0",
+    "eslint": "^7.19.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.29.3",

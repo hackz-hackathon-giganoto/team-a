@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  voice-api: 
+    build: 
+      context: ./fastapi
+      dockerfile: Dockerfile.debian
+    ports: 
+      - "9000:9000"
+      - "8000:8000"
+      - "80:80"
+      - "443:443"
+    
