@@ -14,3 +14,7 @@ type PostScoreRequest struct {
 type PostScoreResponse struct {
 	Message string `json:"message"`
 }
+
+type GetPodsCountResponse struct {
+	Count int `json:"count"`
+}

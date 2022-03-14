@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"main/lib/k8s"
 	"main/lib/redis"
 	"time"
 
@@ -93,6 +94,22 @@ func main() {
 
 	router.GET("/ws", func(c *gin.Context) {
 		// WebSocket is here...
+	})
+
+	router.GET("/pod", func(c *gin.Context) {
+		namespace := c.Query("namespace")
+		pod := c.Query("pod_name")
+		podsCount, err := k8s.GetPodsCount(namespace, pod)
+		if err != nil || podsCount == -1 {
+			c.JSON(http.StatusBadGateway, gin.H{
+				"error": fmt.Sprintf("get k8s err: %s", err.Error()),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, GetPodsCountResponse{
+			Count: podsCount,
+		})
 	})
 	router.Run(":80")
 }

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: giganoto-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: giganoto-nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
+  template:
+    metadata:
+      labels:
+        app: giganoto-nginx
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+        - name: giganoto-nginx
+          image: mcr.microsoft.com/oss/nginx/nginx:1.15.5-alpine
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 250m
+            # limits:
+            #   cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: giganoto-nginx
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: giganoto-nginx
