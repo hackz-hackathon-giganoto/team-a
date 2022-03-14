@@ -14,3 +14,4 @@ Wave
 aiofiles
 librosa
 PySoundFile
+pydub

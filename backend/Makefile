@@ -10,6 +10,10 @@ build-m1:
 build-debian:
 	docker-compose -f ./docker-compose.debian.yml build --parallel
 
+.PHONY: upd-debian
+upd-debian:
+	docker-compose -f ./docker-compose.debian.yml up -d
+
 .PHONY: up-debian
 up-debian:
-	docker-compose -f ./docker-compose.debian.yml up -d
+	docker-compose -f ./docker-compose.debian.yml up
