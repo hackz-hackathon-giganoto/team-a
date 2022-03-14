@@ -5,7 +5,7 @@ import speech_recognition as sr
 import math
 import soundfile as sf
 from io import BytesIO
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 import librosa
 import random
@@ -111,16 +111,18 @@ def calc_score(filename):
 
 
 @app.post("/convert/wav")
-async def create_upload_file(file: UploadFile = File(...)):
+async def create_upload_file(file: UploadFile = File(...), user_id: str = Form(...)):
+    # 前処理
+    print(user_id)
     wavdata = file.file
-    print(file.filename)
     audio_data, samplerate = sf.read(BytesIO(wavdata.read()))
-    filename = randomname(16) + ".wav"
+    filename = randomname(32) + ".wav"
     sf.write(filename, audio_data, samplerate)
-    # with sr.AudioFile(filename) as source:
-    #     audio = r.record(source)
+
+    # スコアデータの計算
     score = calc_score(filename)
-    # text = r.recognize_google(audio, language="ja-JP")
+    # Goサーバーに送信
+
     return {"text": score['text']}
 
 
