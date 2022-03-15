@@ -13,7 +13,7 @@ const Header = (props: HeaderProps) => {
       <p className="header-item">奇声を発してハッピーハッピー</p>
       <div>
         <p className="header-item">
-          {props.state} / 接続ユーザー数: {props.user_count}人
+          {props.state} / 接続ユーザー数: {props.user_count}人 / 現在のPod数: {props.pod_count}台
         </p>
         {/*<p className="header-item">{`Pod数: ${props.pod_count}`}</p>*/}
       </div>
