@@ -14,7 +14,7 @@ window.MediaRecorder = AudioRecorder;
 
 const App = () => {
     // Auth
-    const [isAuthenticated, userHasAuthenticated] = useState(false);
+    const [isAuthenticated, userHasAuthenticated] = useState(true);
     const [user, setUser] = useState(null);
     const [file, setFile] = useState([]);
     const [audioState, setAudioState] = useState(true);
@@ -216,9 +216,10 @@ const App = () => {
 
         const user_id = user === null || user.userId === null || user.userId === undefined || user.userId.length === 0 ? "example-user-id" : user.userId;
         onPostForm({
-            file: new File([new Blob(file)], uuidv4() + ".wav", metadata), //TODO UserIdを渡す
+            file: new File([new Blob(file)], uuidv4() + ".wav", metadata),
             user_id: user_id,
         });
+        setFile([]);
     };
     const handleRemove = () => {
         setAudioState(true);
