@@ -54,10 +54,34 @@ const App = () => {
       // Auth
       await getUserInfo();
 
-      if (userIdRef.current !== null) {
-        // WebSocket
-        if (userIdRef.current === undefined) {
-          userIdRef.current = "example-user-id";
+            if (userIdRef.current !== undefined) {
+                // WebSocket
+                console.log("websocket initializing...");
+                console.log(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`);
+                const webSocket = new WebSocket(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`);
+                webSocket.onerror = (event) => {
+                    console.log(event);
+                };
+                webSocket.onopen = (event) => {
+                    console.log(event);
+                };
+                webSocket.onmessage = function (event) {
+                    const json = JSON.parse(event.data);
+                    console.log(`[message] Data received from server: ${json}`);
+                    try {
+                        if ((json.event = "data")) {
+                            switch (json.action) {
+                                case "SCORE_DATA":
+                                    console.log(json);
+                                    setScore(json);
+                            }
+                        }
+                    } catch (err) {
+                        console.log(err);
+                        // whatever you wish to do with the err
+                    }
+                };
+            }
         }
         console.log("websocket initializing...");
         console.log(
