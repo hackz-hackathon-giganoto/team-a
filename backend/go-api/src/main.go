@@ -20,7 +20,7 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
-func calcAllScore() int64 {
+func calcAllScore() float64 {
 	allScores, err := redis.HVals(STORE_USER_SCORE)
 
 	if err != nil {
@@ -28,11 +28,13 @@ func calcAllScore() int64 {
 		return -1
 	}
 	//母数の計算
-	var score int64
+	var score float64
 	for _, val := range allScores {
-		convertVal, _ := strconv.ParseInt(val, 10, 64)
+
+		convertVal, _ := strconv.ParseFloat(val, 64)
 		score = score + convertVal
 	}
+	log.Println("All score: ", score)
 	return score
 }
 func startJob(config *rest.Config) {
@@ -45,7 +47,7 @@ func startJob(config *rest.Config) {
 			//母数の計算
 			score := calcAllScore()
 
-			if score == 0 {
+			if score <= 0.0 {
 				continue
 			}
 
@@ -69,6 +71,7 @@ func startJob(config *rest.Config) {
 				}
 				//ユーザー負担額の計算
 				userCost := cost * (int(userScore) / (int(score) * 1.0))
+				log.Println("User cost: ", userCost)
 				connections, _ := redis.DBSize()
 				callback := SocketResponse{
 					Cost:   int64(userCost),
@@ -97,7 +100,7 @@ func startJob(config *rest.Config) {
 			score := calcAllScore()
 			podNum, _ := k8s.GetPodsCount(config, "default", POD_NAME)
 			log.Println("Score is", score)
-			newNum := (score / threshold) + minNum
+			newNum := int64(score/threshold) + minNum
 			log.Println("Pod num is ", newNum)
 			if newNum < int64(podNum) {
 				continue
