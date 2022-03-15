@@ -101,7 +101,7 @@ const App = () => {
             Object.keys(data).forEach(function (key) {
                 params.append(key, this[key]);
             }, data);
-            const res = await axios.post("http://localhost:8000/convert/wav", params, {
+            const res = await axios.post(`${process.env.FAST_API_ORIGIN || "http://localhost:8000"}/convert/wav`, params, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
