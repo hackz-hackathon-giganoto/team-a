@@ -16,6 +16,7 @@ const App = () => {
     const [audioState, setAudioState] = useState(true);
     const audioRef = useRef();
     const userIdRef = useRef();
+    const [score, setScore] = useState({})
     // for audio
     let audio_sample_rate = null;
     let scriptProcessor = null;
@@ -54,7 +55,11 @@ const App = () => {
                     console.log(`[message] Data received from server: ${json}`);
                     try {
                         if ((json.event = "data")) {
-                            console.log(json.data);
+                            switch(json.action) {
+                                case "SCORE_DATA": 
+                                    console.log(json);
+                                    setScore(json)
+                            }
                         }
                     } catch (err) {
                         console.log(err)
@@ -250,6 +255,10 @@ const App = () => {
         <button onClick={handleRemove}>削除</button>
         <ReactAudioPlayer src={URL.createObjectURL(new Blob(file))} controls/>
         {isAuthenticated ? <p>ログイン済み</p> : <p>未ログイン</p>}
+        <p>スコア：{score.score}点</p>
+        <p>負担額：{score.cost}円</p>
+        <p>参加者数：{score.count}人</p>
+        <p>コンテナ数（Pod数）：{score.pod_num}個</p>
     </div>);
 };
 
