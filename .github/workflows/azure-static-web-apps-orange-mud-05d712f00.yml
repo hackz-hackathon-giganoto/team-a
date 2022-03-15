@@ -12,6 +12,7 @@ on:
       - main
     paths:
       - "frontend/**"
+  workflow_dispatch:
 
 jobs:
   build_and_deploy_job:
@@ -20,6 +21,7 @@ jobs:
     name: Build and Deploy Job
     env:
       CI: false
+      GO_API_ORIGIN: ${{ secrets.GO_API_ORIGIN }}
       FAST_API_ORIGIN: ${{ secrets.FAST_API_ORIGIN }}
     steps:
       - uses: actions/checkout@v2

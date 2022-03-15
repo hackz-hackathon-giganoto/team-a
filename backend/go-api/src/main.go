@@ -45,6 +45,10 @@ func startJob(config *rest.Config) {
 			//母数の計算
 			score := calcAllScore()
 
+			if score == 0 {
+				continue
+			}
+
 			//ユーザーリストの取得
 			userList, err := redis.SMEMBERS(CONNECTION_PATH)
 			if err != nil {
