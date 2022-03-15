@@ -8,6 +8,7 @@ import {v4 as uuidv4} from "uuid";
 import "./App.css";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import Header from "./components/Header";
+import GaugeChart from "react-gauge-chart";
 
 window.MediaRecorder = AudioRecorder;
 
@@ -19,7 +20,7 @@ const App = () => {
     const [audioState, setAudioState] = useState(true);
     const audioRef = useRef();
     const userIdRef = useRef();
-    const [score, setScore] = useState({})
+    const [score, setScore] = useState({score: 0, count: 0, pod_num: 0, cost: 0})
     // for audio
     let audio_sample_rate = null;
     let scriptProcessor = null;
@@ -36,21 +37,20 @@ const App = () => {
         navigator.getUserMedia({
             audio: true, video: false,
         }, handleSuccess, hancleError);
+
         async function handler() {
             // Auth
             await getUserInfo();
 
-            if(userIdRef.current != null) {
+            if (userIdRef.current != null) {
                 // WebSocket
                 console.log("websocket initializing...")
                 console.log(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`)
-                const webSocket = new WebSocket(
-                    `${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`
-                )
-                webSocket.onerror = (event)=>{
+                const webSocket = new WebSocket(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`)
+                webSocket.onerror = (event) => {
                     console.log(event)
                 }
-                webSocket.onopen = (event)=>{
+                webSocket.onopen = (event) => {
                     console.log(event)
                 }
                 webSocket.onmessage = function (event) {
@@ -58,8 +58,8 @@ const App = () => {
                     console.log(`[message] Data received from server: ${json}`);
                     try {
                         if ((json.event = "data")) {
-                            switch(json.action) {
-                                case "SCORE_DATA": 
+                            switch (json.action) {
+                                case "SCORE_DATA":
                                     console.log(json);
                                     setScore(json)
                             }
@@ -71,6 +71,7 @@ const App = () => {
                 };
             }
         }
+
         handler()
     }, []);
     // export WAV from audio float data
@@ -249,11 +250,22 @@ const App = () => {
     return (
 
         <div>
-            {isAuthenticated ?   <Header state={"ログイン済"}/> :<Header state={"未ログイン"}/>}
 
-            <div class="d-flex flex-column">
+            {isAuthenticated ? <Header state={"ログイン済"} pod_count={score.pod_num} user_count={score.count}/> :
+                <Header state={"未ログイン"} user_count={score.count} pod_count={score.pod_num}/>}
+            <div class="mx-auto d-flex flex-column chart-container">
+                <GaugeChart
+                    class="chart"
+                    textColor="#333"
+                    id="gauge-chart2"
+                    nrOfLevels={30}
+                    percent={120 / 100.0}
+                    formatTextValue={(value) => `${value}点`}
+                />
+                <p className="mx-auto cost-text">あなたの負担額：{score.cost}円</p>
+            </div>
+            <div class="d-flex flex-column mx-auto">
                 <div class="record-container mx-auto">
-                    <h4>デモプレイ</h4>
                     <ReactAudioPlayer
                         src={URL.createObjectURL(new Blob(file))}
                         controls
@@ -277,12 +289,6 @@ const App = () => {
             <div class="login-container mx-auto">
                 <NavBar user={user}/>
             </div>
-
-            <p>スコア：{score.score}点</p>
-        <p>負担額：{score.cost}円</p>
-        <p>参加者数：{score.count}人</p>
-        <p>コンテナ数（Pod数）：{score.pod_num}個</p>
-
         </div>);
 };
 

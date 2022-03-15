@@ -49,3 +49,9 @@
   width: 23rem;
   margin: 0.5rem;
 }
+.chart-container{
+  width: 50rem;
+}
+.cost-text{
+  font-size:3rem;
+}
