@@ -70,7 +70,7 @@ func startJob(config *rest.Config) {
 					continue
 				}
 				//ユーザー負担額の計算
-				userCost := cost * (int(userScore) / (int(score) * 1.0))
+				userCost := int(float64(cost) * (userScore / score))
 				connections, _ := redis.DBSize()
 				callback := SocketResponse{
 					Cost:   int64(userCost),

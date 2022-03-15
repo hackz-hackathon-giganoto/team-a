@@ -1,7 +1,6 @@
 # coding: utf-8
 from os import getenv
 import speech_recognition as sr
-import math
 import soundfile as sf
 from io import BytesIO
 from fastapi import FastAPI, File, UploadFile, Form
@@ -11,8 +10,8 @@ import random
 import shutil
 import json
 import string
-import pydub
-from pydub import AudioSegment
+# import pydub
+# from pydub import AudioSegment
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 import wave
@@ -155,6 +154,7 @@ async def create_upload_file(file: UploadFile = File(...), user_id: str = Form(.
     # return json.loads(response.text)
     return request_data
 
+
 def save_upload_file_tmp(upload_file: UploadFile) -> Path:
     try:
         suffix = Path(upload_file.filename).suffix
@@ -166,16 +166,16 @@ def save_upload_file_tmp(upload_file: UploadFile) -> Path:
     return tmp_path
 
 
-@app.post("/convert/mp3")
-async def create_mp3_file(file: UploadFile = File(...)):
-    path = save_upload_file_tmp(file)
-    print(file.filename)
-    print(path)
-    base_sound = AudioSegment.from_file(path, format="mp3")  # 音声を読み込み
-    length_seconds = base_sound.duration_seconds  # 長さを確認
-    print(length_seconds)
-    base_sound.export("./result.mp3", format="mp3")  # 保存する
-    return
+# @app.post("/convert/mp3")
+# async def create_mp3_file(file: UploadFile = File(...)):
+#     path = save_upload_file_tmp(file)
+#     print(file.filename)
+#     print(path)
+#     base_sound = AudioSegment.from_file(path, format="mp3")  # 音声を読み込み
+#     length_seconds = base_sound.duration_seconds  # 長さを確認
+#     print(length_seconds)
+#     base_sound.export("./result.mp3", format="mp3")  # 保存する
+#     return
 
 
 # @app.websocket("/ws")

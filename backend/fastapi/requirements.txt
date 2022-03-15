@@ -13,8 +13,5 @@ uvicorn
 Wave
 aiofiles
 librosa
-PySoundFile
-pydub
 requests
 urllib3
-gunicorn
