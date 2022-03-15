@@ -157,8 +157,15 @@ const App = () => {
       Object.keys(data).forEach(function (key) {
         params.append(key, this[key]);
       }, data);
+      console.log(
+        `${
+          process.env.REACT_APP_FAST_API_ORIGIN || "http://localhost:8000"
+        }/convert/wav`
+      );
       const res = await axios.post(
-        `${process.env.FAST_API_ORIGIN || "http://localhost:8000"}/convert/wav`,
+        `${
+          process.env.REACT_APP_FAST_API_ORIGIN || "http://localhost:8000"
+        }/convert/wav`,
         params,
         {
           headers: {
