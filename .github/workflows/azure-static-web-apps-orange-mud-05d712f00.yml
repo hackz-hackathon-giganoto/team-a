@@ -20,6 +20,7 @@ jobs:
     name: Build and Deploy Job
     env:
       CI: false
+      FAST_API_ORIGIN: ${{ secrets.FAST_API_ORIGIN }}
     steps:
       - uses: actions/checkout@v2
         with:
