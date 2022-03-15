@@ -259,7 +259,7 @@ const App = () => {
                     textColor="#333"
                     id="gauge-chart2"
                     nrOfLevels={30}
-                    percent={120 / 100.0}
+                    percent={score.score / 100.0}
                     formatTextValue={(value) => `${value}点`}
                 />
                 <p className="mx-auto cost-text">あなたの負担額：{score.cost}円</p>
