@@ -15,6 +15,8 @@ const App = () => {
     const [file, setFile] = useState([]);
     const [audioState, setAudioState] = useState(true);
     const audioRef = useRef();
+    const userIdRef = useRef();
+    const [score, setScore] = useState({})
     // for audio
     let audio_sample_rate = null;
     let scriptProcessor = null;
@@ -31,8 +33,42 @@ const App = () => {
         navigator.getUserMedia({
             audio: true, video: false,
         }, handleSuccess, hancleError);
-        // Auth
-        getUserInfo();
+        async function handler() {
+            // Auth
+            await getUserInfo();
+
+            if(userIdRef.current != null) {
+                // WebSocket
+                console.log("websocket initializing...")
+                console.log(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`)
+                const webSocket = new WebSocket(
+                    `${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`
+                )
+                webSocket.onerror = (event)=>{
+                    console.log(event)
+                }
+                webSocket.onopen = (event)=>{
+                    console.log(event)
+                }
+                webSocket.onmessage = function (event) {
+                    const json = JSON.parse(event.data);
+                    console.log(`[message] Data received from server: ${json}`);
+                    try {
+                        if ((json.event = "data")) {
+                            switch(json.action) {
+                                case "SCORE_DATA": 
+                                    console.log(json);
+                                    setScore(json)
+                            }
+                        }
+                    } catch (err) {
+                        console.log(err)
+                        // whatever you wish to do with the err
+                    }
+                };
+            }
+        }
+        handler()
     }, []);
     // export WAV from audio float data
     const exportWAV = function (audioData) {
@@ -198,7 +234,9 @@ const App = () => {
             if (clientPrincipal) {
                 setUser(clientPrincipal);
                 userHasAuthenticated(true);
-                console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal.user)}`);
+                userIdRef.current = clientPrincipal.userId
+                console.log(userIdRef.current)
+                console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
             }
         } catch (error) {
             console.error("No profile could be found " + error?.message?.toString());
@@ -217,6 +255,10 @@ const App = () => {
         <button onClick={handleRemove}>削除</button>
         <ReactAudioPlayer src={URL.createObjectURL(new Blob(file))} controls/>
         {isAuthenticated ? <p>ログイン済み</p> : <p>未ログイン</p>}
+        <p>スコア：{score.score}点</p>
+        <p>負担額：{score.cost}円</p>
+        <p>参加者数：{score.count}人</p>
+        <p>コンテナ数（Pod数）：{score.pod_num}個</p>
     </div>);
 };
 

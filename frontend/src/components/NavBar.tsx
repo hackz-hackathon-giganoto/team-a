@@ -11,7 +11,7 @@ const NavBar = ({ user }) => {
     <>
       {!user &&
         providers.map((provider) => (
-          <span>
+          <span key={provider}>
             <a
               key={provider}
               href={`/.auth/login/${provider}?post_login_redirect_uri=${redirect}`}
