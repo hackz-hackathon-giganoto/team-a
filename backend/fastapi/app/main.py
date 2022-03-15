@@ -124,7 +124,7 @@ def calc_score(filename):
     str_len = second_str * duration
     # 割合を計算
     parcent = len(text) / str_len
-    score_text = rms * (100 - (100 * parcent))
+    score_text = ave_rms * (100 - (100 * parcent))
 
     data['duration'] = duration
     data['score'] = score_text
