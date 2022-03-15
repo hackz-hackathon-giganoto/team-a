@@ -26,6 +26,7 @@ const App = () => {
     pod_num: 0,
     cost: 0,
   });
+  const [point, setPoint] = useState({ point: 0 });
   // for audio
   let audio_sample_rate = null;
   let scriptProcessor = null;
@@ -53,8 +54,11 @@ const App = () => {
       // Auth
       await getUserInfo();
 
-      if (userIdRef.current != null) {
+      if (userIdRef.current !== null) {
         // WebSocket
+        if (userIdRef.current === undefined) {
+          userIdRef.current = "example-user-id";
+        }
         console.log("websocket initializing...");
         console.log(
           `${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${
@@ -174,6 +178,11 @@ const App = () => {
         }
       );
       console.log(res);
+      const point = res.data.score;
+      console.log(point);
+      if (point !== null) {
+        setPoint({ point: point.toFixed() });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -304,7 +313,7 @@ const App = () => {
           textColor="#333"
           id="gauge-chart2"
           nrOfLevels={30}
-          percent={score.score / 100.0}
+          percent={point.point / 100.0}
           formatTextValue={(value) => `${value}点`}
         />
         <p className="mx-auto cost-text">あなたの負担額：{score.cost}円</p>

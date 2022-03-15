@@ -147,12 +147,13 @@ async def create_upload_file(file: UploadFile = File(...), user_id: str = Form(.
     # Goサーバーに送信
     request_data = {"score": score["score"], "user_id": user_id}
     # リクエストを作成
-    # print(json.dumps(request_data))
+    print(json.dumps(request_data))
     response = requests.post(
         getenv("GO_API_URL"),
         data=json.dumps(request_data))
-    return json.loads(response.text)
-
+    print(response)
+    # return json.loads(response.text)
+    return request_data
 
 def save_upload_file_tmp(upload_file: UploadFile) -> Path:
     try:
