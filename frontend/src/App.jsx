@@ -45,11 +45,8 @@ const App = () => {
             // Auth
             await getUserInfo();
 
-            if (userIdRef.current !== null) {
+            if (userIdRef.current !== undefined) {
                 // WebSocket
-                if (userIdRef.current === undefined) {
-                    userIdRef.current = "example-user-id";
-                }
                 console.log("websocket initializing...");
                 console.log(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`);
                 const webSocket = new WebSocket(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`);
