@@ -84,7 +84,7 @@ def calc_ave_rms(datas):
             ave_rms += rms * 2**(0.5)
     print("Max rms is :", max)
     print("Min rms is :", min)
-    ave_rms = ave_rms / (array_len - (0.1 * array_len))
+    ave_rms = ave_rms / (array_len - (0.15 * array_len))
     if ave_rms > 1.0:
         ave_rms = 1.0
     return ave_rms
