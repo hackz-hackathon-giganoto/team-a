@@ -44,3 +44,8 @@
 .login-container {
   width: 24rem;
 }
+
+.record-container{
+  width: 23rem;
+  margin: 0.5rem;
+}
