@@ -41,7 +41,7 @@ func startJob(config *rest.Config) {
 
 	// WebSocketに良い感じに流すジョブ
 	go func() {
-		for range time.Tick(5 * time.Second) {
+		for range time.Tick(30 * time.Second) {
 			fmt.Println("Socket Job is called")
 
 			//母数の計算
@@ -96,7 +96,7 @@ func startJob(config *rest.Config) {
 	const minNum = 3
 	// Podの監視ジョブ
 	go func() {
-		for range time.Tick(6 * time.Second) {
+		for range time.Tick(10 * time.Second) {
 			fmt.Println("Pod Job is called")
 			score := calcAllScore()
 			podNum, _ := k8s.GetPodsCount(config, "default", POD_NAME)
