@@ -92,7 +92,7 @@ func startJob(config *rest.Config) {
 		}
 	}()
 	//全ユーザーのスコアが1000nに達したらpodを増やす
-	const threshold = 1000
+	const threshold = 810
 	const minNum = 3
 	// Podの監視ジョブ
 	go func() {
@@ -106,10 +106,10 @@ func startJob(config *rest.Config) {
 			if newNum < int64(podNum) {
 				continue
 			}
-			// _, err := k8s.UpdatePodCount(config, "default", POD_NAME, int(newNum))
-			// if err != nil {
-			// 	log.Println(err)
-			// }
+			_, err := k8s.UpdatePodCount(config, "default", POD_NAME, int(newNum))
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}()
 }
