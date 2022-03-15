@@ -65,7 +65,27 @@ def calc_rms(filename):
 
     # db: 20 * log_10(volume)
     rms = librosa.feature.rms(y=wave_data)  # 音量の計算
+    # times = librosa.times_like(rms, sr=fs)
+    # print("Times: ", times)
     return {"rms": rms, "duration": 1.0 * fn / fr}
+
+
+def calc_ave_rms(datas):
+    ave_rms = 0.0
+    array_len = 0
+    min = 1.0
+    max = 0.0
+    for data in datas:
+        array_len = array_len + len(data)
+        for rms in data:
+            if rms < min:
+                min = rms
+            if rms > max:
+                max = rms
+            ave_rms += rms * 2**(0.5)
+    print("Max rms is :", max)
+    print("Min rms is :", min)
+    return ave_rms / array_len
 
 
 def voice_recognition(filename):
@@ -95,18 +115,20 @@ def calc_score(filename):
     second_str = 6
     data = {}
     rms = calc_rms(filename)
+    ave_rms = calc_ave_rms(rms['rms'])
+    print("RMS: ", ave_rms)
     text = voice_recognition(filename)
     duration = rms["duration"]
-
+    # print(rms)
     # 総文字数を計算
     str_len = second_str * duration
     # 割合を計算
     parcent = len(text) / str_len
-    score_text = 100 - (100 * parcent)
+    score_text = rms * (100 - (100 * parcent))
 
     data['duration'] = duration
     data['score'] = score_text
-    print(rms)
+    # print(rms)
     # data['db'] = 20 * math.log10(rms)
     return data
 
@@ -125,7 +147,7 @@ async def create_upload_file(file: UploadFile = File(...), user_id: str = Form(.
     # Goサーバーに送信
     request_data = {"score": score["score"], "user_id": user_id}
     # リクエストを作成
-    print(json.dumps(request_data))
+    # print(json.dumps(request_data))
     response = requests.post(
         getenv("GO_API_URL"),
         data=json.dumps(request_data))
