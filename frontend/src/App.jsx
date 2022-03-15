@@ -14,7 +14,7 @@ window.MediaRecorder = AudioRecorder;
 
 const App = () => {
     // Auth
-    const [isAuthenticated, userHasAuthenticated] = useState(true);
+    const [isAuthenticated, userHasAuthenticated] = useState(false);
     const [user, setUser] = useState(null);
     const [file, setFile] = useState([]);
     const [audioState, setAudioState] = useState(true);
