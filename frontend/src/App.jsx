@@ -4,7 +4,11 @@ import ReactAudioPlayer from "react-audio-player";
 import axios from "axios";
 import AudioRecorder from "audio-recorder-polyfill";
 import NavBar from "./components/NavBar";
-import {v4 as uuidv4} from 'uuid';
+import {v4 as uuidv4} from "uuid";
+import "./App.css";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import Header from "./components/Header";
+import GaugeChart from "react-gauge-chart";
 
 window.MediaRecorder = AudioRecorder;
 
@@ -16,14 +20,14 @@ const App = () => {
     const [audioState, setAudioState] = useState(true);
     const audioRef = useRef();
     const userIdRef = useRef();
-    const [score, setScore] = useState({})
+    const [score, setScore] = useState({score: 0, count: 0, pod_num: 0, cost: 0})
     // for audio
     let audio_sample_rate = null;
     let scriptProcessor = null;
     let audioContext = null;
 
     // audio data
-    let audioData = [];
+
     let bufferSize = 1024;
 
     useEffect(() => {
@@ -33,21 +37,20 @@ const App = () => {
         navigator.getUserMedia({
             audio: true, video: false,
         }, handleSuccess, hancleError);
+
         async function handler() {
             // Auth
             await getUserInfo();
 
-            if(userIdRef.current != null) {
+            if (userIdRef.current != null) {
                 // WebSocket
                 console.log("websocket initializing...")
                 console.log(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`)
-                const webSocket = new WebSocket(
-                    `${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`
-                )
-                webSocket.onerror = (event)=>{
+                const webSocket = new WebSocket(`${process.env.REACT_APP_GO_API_ORIGIN || "ws://localhost"}/ws/${userIdRef.current}`)
+                webSocket.onerror = (event) => {
                     console.log(event)
                 }
-                webSocket.onopen = (event)=>{
+                webSocket.onopen = (event) => {
                     console.log(event)
                 }
                 webSocket.onmessage = function (event) {
@@ -55,8 +58,8 @@ const App = () => {
                     console.log(`[message] Data received from server: ${json}`);
                     try {
                         if ((json.event = "data")) {
-                            switch(json.action) {
-                                case "SCORE_DATA": 
+                            switch (json.action) {
+                                case "SCORE_DATA":
                                     console.log(json);
                                     setScore(json)
                             }
@@ -68,6 +71,7 @@ const App = () => {
                 };
             }
         }
+
         handler()
     }, []);
     // export WAV from audio float data
@@ -199,10 +203,10 @@ const App = () => {
             contentType: "audio/wav",
         };
 
-        const user_id = user === null || user.userId === null || user.userId === undefined ||  user.userId.length === 0 ? "example-user-id" : user.userId
+        const user_id = user === null || user.userId === null || user.userId === undefined || user.userId.length === 0 ? "example-user-id" : user.userId;
         onPostForm({
             file: new File([new Blob(file)], uuidv4() + ".wav", metadata), //TODO UserIdを渡す
-            user_id: user_id
+            user_id: user_id,
         });
     };
     const handleRemove = () => {
@@ -243,23 +247,49 @@ const App = () => {
         }
     }
 
-    return (<div>
-        <NavBar user={user}/>
-        <button onClick={handleStart}>録音</button>
-        <button onClick={handleStop} disabled={audioState}>
-            ストップ
-        </button>
-        <button onClick={handleSubmit} disabled={file.length === 0}>
-            送信
-        </button>
-        <button onClick={handleRemove}>削除</button>
-        <ReactAudioPlayer src={URL.createObjectURL(new Blob(file))} controls/>
-        {isAuthenticated ? <p>ログイン済み</p> : <p>未ログイン</p>}
-        <p>スコア：{score.score}点</p>
-        <p>負担額：{score.cost}円</p>
-        <p>参加者数：{score.count}人</p>
-        <p>コンテナ数（Pod数）：{score.pod_num}個</p>
-    </div>);
+    return (
+
+        <div>
+
+            {isAuthenticated ? <Header state={"ログイン済"} pod_count={score.pod_num} user_count={score.count}/> :
+                <Header state={"未ログイン"} user_count={score.count} pod_count={score.pod_num}/>}
+            <div class="mx-auto d-flex flex-column chart-container">
+                <GaugeChart
+                    class="chart"
+                    textColor="#333"
+                    id="gauge-chart2"
+                    nrOfLevels={30}
+                    percent={score.score / 100.0}
+                    formatTextValue={(value) => `${value}点`}
+                />
+                <p className="mx-auto cost-text">あなたの負担額：{score.cost}円</p>
+            </div>
+            <div class="d-flex flex-column mx-auto">
+                <div class="record-container mx-auto">
+                    <ReactAudioPlayer
+                        src={URL.createObjectURL(new Blob(file))}
+                        controls
+                    />
+                </div>
+                <div class="d-flex app-container mx-auto">
+                    <button class="btn btn-primary" onClick={handleStart}><i
+                        class="fa-solid fa-record-vinyl"/> 録音
+                    </button>
+                    <button class="btn btn-primary" onClick={handleStop} disabled={audioState}>
+                        <i className="fa-solid fa-stop"/> ストップ
+                    </button>
+                    <button class="btn btn-primary" onClick={handleSubmit} disabled={file.length === 0}>
+                        <i className="fa-solid fa-share"/> 送信
+                    </button>
+                    <button class="btn btn-primary" onClick={handleRemove}><i
+                        className="fa-solid fa-trash-can"/> 削除
+                    </button>
+                </div>
+            </div>
+            <div class="login-container mx-auto">
+                <NavBar user={user}/>
+            </div>
+        </div>);
 };
 
 export default App;

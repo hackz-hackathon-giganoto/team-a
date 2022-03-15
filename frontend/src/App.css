@@ -36,3 +36,22 @@
     transform: rotate(360deg);
   }
 }
+
+.app-container {
+  margin: 2rem 0;
+}
+
+.login-container {
+  width: 24rem;
+}
+
+.record-container{
+  width: 23rem;
+  margin: 0.5rem;
+}
+.chart-container{
+  width: 50rem;
+}
+.cost-text{
+  font-size:3rem;
+}

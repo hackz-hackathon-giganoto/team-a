@@ -17,3 +17,4 @@ PySoundFile
 pydub
 requests
 urllib3
+gunicorn
