@@ -92,7 +92,7 @@ func startJob(config *rest.Config) {
 		}
 	}()
 	//全ユーザーのスコアが1000nに達したらpodを増やす
-	const threshold = 100
+	const threshold = 300
 	const minNum = 3
 	// Podの監視ジョブ
 	go func() {
