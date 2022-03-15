@@ -22,7 +22,7 @@ jobs:
     env:
       CI: false
       REACT_APP_GO_API_ORIGIN: ${{ secrets.GO_API_ORIGIN }}
-      FAST_API_ORIGIN: ${{ secrets.FAST_API_ORIGIN }}
+      REACT_APP_FAST_API_ORIGIN: ${{ secrets.FAST_API_ORIGIN }}
     steps:
       - uses: actions/checkout@v2
         with:
