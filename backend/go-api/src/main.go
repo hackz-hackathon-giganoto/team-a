@@ -71,7 +71,6 @@ func startJob(config *rest.Config) {
 				}
 				//ユーザー負担額の計算
 				userCost := cost * (int(userScore) / (int(score) * 1.0))
-				log.Println("User cost: ", userCost)
 				connections, _ := redis.DBSize()
 				callback := SocketResponse{
 					Cost:   int64(userCost),
@@ -80,6 +79,8 @@ func startJob(config *rest.Config) {
 					Score:  userScore,
 					Pods:   podNum,
 				}
+				log.Println("Response: ", callback)
+
 				response, err := json.Marshal(callback)
 				if err != nil {
 					log.Println(err)
