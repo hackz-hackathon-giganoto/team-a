@@ -252,6 +252,12 @@ const App = () => {
               </button>
             </div>
           </div>
+          <p style={{ width: 500, textAlign: "center", margin: "auto" }}>
+            当時は奇声スコアに応じてインフラであるk8sのPods数をスケールさせるような謎仕様でしたが今はそうではありません。Fargate上で動いていますし、タスク数がスケールすることはありません。
+          </p>
+          <p style={{ width: 500, textAlign: "center", margin: "auto" }}>
+            いかに高い奇声スコアを取れるか是非チャレンジしてみてください
+          </p>
         </div>
       ) : (
         <></>
