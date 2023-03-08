@@ -1,42 +1,43 @@
 import React from "react";
+import { useAuth0, User } from "@auth0/auth0-react";
 
-const NavBar = ({ user }: { user: object | null }) => {
-  const redirect = `/`;
+const LoginButton = () => {
+  const { loginWithRedirect } = useAuth0();
 
   return (
+    <button
+      className="btn btn-info btn-block"
+      onClick={() => loginWithRedirect()}
+    >
+      Sign in with Auth0
+    </button>
+  );
+};
+
+const LogoutButton = () => {
+  const { logout } = useAuth0();
+
+  return (
+    <button
+      className="btn btn-danger btn-block"
+      onClick={() =>
+        logout({ logoutParams: { returnTo: window.location.origin } })
+      }
+    >
+      Logout
+    </button>
+  );
+};
+
+type NavBarProps = {
+  user: User;
+};
+
+const NavBar = ({ user }: NavBarProps) => {
+  return (
     <>
-      {!user && (
-        <span>
-          <a
-            href={`/.auth/login/google?post_login_redirect_uri=${redirect}`}
-            className="btn btn-danger btn-block"
-          >
-            <i className="fa fa-google" /> Sign in with <b>Google</b>
-          </a>
-          <a
-            href={`/.auth/login/twitter?post_login_redirect_uri=${redirect}`}
-            className="btn btn-info btn-block"
-          >
-            <i className="fa fa-twitter" /> Sign in with <b>Twitter</b>
-          </a>
-          <a
-            href={`/.auth/login/github?post_login_redirect_uri=${redirect}`}
-            className="btn btn-dark btn-block"
-          >
-            <i className="fa fa-github" /> Sign in with <b>Github</b>
-          </a>
-        </span>
-      )}
-      {user && (
-        <div>
-          <a
-            href={`/.auth/logout?post_logout_redirect_uri=${redirect}`}
-            className="btn btn-danger btn-block"
-          >
-            <b>Logout</b>
-          </a>
-        </div>
-      )}
+      {!user && <LoginButton />}
+      {user && <LogoutButton />}
     </>
   );
 };
