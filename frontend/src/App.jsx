@@ -8,13 +8,13 @@ import { v4 as uuidv4 } from "uuid";
 import "./App.css";
 import Header from "./components/Header";
 import GaugeChart from "react-gauge-chart";
+import { useAuth0 } from "@auth0/auth0-react";
 
 window.MediaRecorder = AudioRecorder;
 
 const App = () => {
-  // Auth
-  const [isAuthenticated, userHasAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+  const { user, isAuthenticated, isLoading } = useAuth0();
+
   const [file, setFile] = useState([]);
   const [audioState, setAudioState] = useState(true);
   const audioRef = useRef();
@@ -157,17 +157,11 @@ const App = () => {
   };
 
   const handleSubmit = () => {
-    let metadata = {
-      contentType: "audio/wav",
+    const metadata = {
+      type: "audio/wav",
     };
 
-    const user_id =
-      user === null ||
-      user.userId === null ||
-      user.userId === undefined ||
-      user.userId.length === 0
-        ? "example-user-id"
-        : user.userId;
+    const user_id = user === undefined ? "example-user-id" : user.sub;
     onPostForm({
       file: new File([new Blob(file)], uuidv4() + ".wav", metadata),
       user_id: user_id,
@@ -186,20 +180,18 @@ const App = () => {
   // auth
   async function getUserInfo() {
     try {
-      const response = await fetch("/.auth/me");
-      const payload = await response.json();
-      const { clientPrincipal } = payload;
-
-      if (clientPrincipal) {
-        setUser(clientPrincipal);
-        userHasAuthenticated(true);
-        userIdRef.current = clientPrincipal.userId;
+      if (user) {
+        userIdRef.current = user.sub;
         console.log(userIdRef.current);
-        console.log(`clientPrincipal = ${JSON.stringify(clientPrincipal)}`);
+        console.log(`user = ${JSON.stringify(user)}`);
       }
     } catch (error) {
       console.error("No profile could be found " + error?.message?.toString());
     }
+  }
+
+  if (isLoading) {
+    return <div>Loading ...</div>;
   }
 
   return (
