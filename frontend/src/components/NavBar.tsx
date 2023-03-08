@@ -1,10 +1,6 @@
-/* eslint-disable react/jsx-key */
-/* eslint-disable react/prop-types */
 import React from "react";
 
-// @ts-ignore
-const NavBar = ({ user }) => {
-  const providers = ["google", "twitter", "github", "aad"];
+const NavBar = ({ user }: { user: object | null }) => {
   const redirect = `/`;
 
   return (
