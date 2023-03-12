@@ -5,7 +5,7 @@ RUN go mod tidy
 # Set Environment Variable
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-ENV GOARCH=amd64
+ENV GOARCH=arm64
 # Build
 RUN go build -o app
 
